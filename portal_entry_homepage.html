@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zero Day Portal - Enter the Grid</title>
+    <link rel="stylesheet" href="main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <style>
+    /* Custom cursor and particle effects */
+    body {
+        cursor: none;
+        overflow: hidden;
+    }
+    
+    .custom-cursor {
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        mix-blend-mode: screen;
+        transition: transform 0.1s ease;
+    }
+    
+    .cursor-trail {
+        position: fixed;
+        width: 4px;
+        height: 4px;
+        background: var(--color-primary);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9998;
+        opacity: 0.7;
+        animation: fade-out 0.8s ease-out forwards;
+    }
+    
+    @keyframes fade-out {
+        to {
+            opacity: 0;
+            transform: scale(0);
+        }
+    }
+    
+    .matrix-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            linear-gradient(90deg, transparent 98%, rgba(0, 255, 65, 0.03) 100%),
+            linear-gradient(180deg, transparent 98%, rgba(0, 255, 65, 0.03) 100%);
+        background-size: 50px 50px;
+        animation: matrix-grid 20s linear infinite;
+        z-index: 1;
+    }
+    
+    @keyframes matrix-grid {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
+    }
+    
+    .data-stream {
+        position: absolute;
+        width: 2px;
+        height: 100px;
+        background: linear-gradient(to bottom, transparent, var(--color-primary), transparent);
+        animation: stream-flow 3s linear infinite;
+    }
+    
+    @keyframes stream-flow {
+        0% { transform: translateY(-100px); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(100vh); opacity: 0; }
+    }
+    
+    .zero-text {
+        font-family: 'Orbitron', sans-serif;
+        font-size: clamp(8rem, 20vw, 24rem);
+        font-weight: 900;
+        color: var(--color-primary);
+        text-shadow: 0 0 50px var(--color-primary);
+        opacity: 0;
+        transform: scale(0.5) rotateY(180deg);
+        animation: materialize-zero 3s cubic-bezier(0.4, 0, 0.2, 1) 1s forwards;
+    }
+    
+    .day-text {
+        font-family: 'Orbitron', sans-serif;
+        font-size: clamp(8rem, 20vw, 24rem);
+        font-weight: 900;
+        color: var(--color-secondary);
+        text-shadow: 0 0 50px var(--color-secondary);
+        opacity: 0;
+        transform: scale(0.5) rotateX(180deg);
+        animation: materialize-day 3s cubic-bezier(0.4, 0, 0.2, 1) 4s forwards;
+    }
+    
+    @keyframes materialize-zero {
+        0% {
+            opacity: 0;
+            transform: scale(0.5) rotateY(180deg);
+            filter: blur(20px);
+        }
+        50% {
+            opacity: 0.7;
+            transform: scale(1.1) rotateY(0deg);
+            filter: blur(5px);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) rotateY(0deg);
+            filter: blur(0px);
+        }
+    }
+    
+    @keyframes materialize-day {
+        0% {
+            opacity: 0;
+            transform: scale(0.5) rotateX(180deg);
+            filter: blur(20px);
+        }
+        50% {
+            opacity: 0.7;
+            transform: scale(1.1) rotateX(0deg);
+            filter: blur(5px);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) rotateX(0deg);
+            filter: blur(0px);
+        }
+    }
+    
+    .flame-nav {
+        opacity: 0;
+        animation: fade-in-nav 1s ease-out 7s forwards;
+    }
+    
+    @keyframes fade-in-nav {
+        to { opacity: 1; }
+    }
+    
+    .flame-button {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: radial-gradient(circle at center, var(--color-primary-10), transparent);
+        border: 2px solid var(--color-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        overflow: hidden;
+    }
+    
+    .flame-button:hover {
+        transform: scale(1.2) translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 255, 65, 0.4);
+        border-color: var(--color-primary);
+    }
+    
+    .flame-button.telegram:hover {
+        border-color: #0088cc;
+        box-shadow: 0 20px 40px rgba(0, 136, 204, 0.4);
+    }
+    
+    .flame-button.instagram:hover {
+        border-color: #e1306c;
+        box-shadow: 0 20px 40px rgba(225, 48, 108, 0.4);
+    }
+    
+    .flame-button.tiktok:hover {
+        border-color: #ff0050;
+        box-shadow: 0 20px 40px rgba(255, 0, 80, 0.4);
+    }
+    
+    .flame-button.youtube:hover {
+        border-color: #ff0000;
+        box-shadow: 0 20px 40px rgba(255, 0, 0, 0.4);
+    }
+    
+    .flame-button.discord:hover {
+        border-color: #7289DA;
+        box-shadow: 0 20px 40px rgba(114, 137, 218, 0.4);
+    }
+    
+    .flame-button::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(from 0deg, transparent, var(--color-primary-10), transparent);
+        animation: rotate 3s linear infinite;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .flame-button:hover::before {
+        opacity: 1;
+    }
+    
+    @keyframes rotate {
+        to { transform: rotate(360deg); }
+    }
+    
+    .terminal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .terminal-window {
+        width: 90%;
+        max-width: 800px;
+        height: 70%;
+        background: var(--color-background);
+        border: 2px solid var(--color-primary);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 50px rgba(0, 255, 65, 0.3);
+    }
+    
+    .terminal-header {
+        background: var(--color-surface);
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--color-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .terminal-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .terminal-content {
+        padding: 20px;
+        height: calc(100% - 60px);
+        overflow-y: auto;
+        font-family: 'Source Code Pro', monospace;
+        color: var(--color-primary);
+        line-height: 1.6;
+    }
+    
+    .tagline {
+        opacity: 0;
+        animation: fade-in-tagline 1s ease-out 8s forwards;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--color-text-secondary);
+        font-size: clamp(1rem, 2vw, 1.5rem);
+        text-align: center;
+        margin-top: 2rem;
+        letter-spacing: 0.1em;
+    }
+    
+    @keyframes fade-in-tagline {
+        to { opacity: 1; }
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+        .zero-text, .day-text {
+            font-size: clamp(4rem, 15vw, 8rem);
+        }
+        
+        .flame-button {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .flame-nav {
+            gap: 1rem;
+        }
+        
+        .terminal-window {
+            width: 95%;
+            height: 80%;
+        }
+    }
+</style>
+<script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fzerodayp4313back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.6"></script>
+</head>
+<body class="bg-background text-text-primary font-jetbrains overflow-hidden">
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="cursor"></div>
+    
+    <!-- Matrix Background Grid -->
+    <div class="matrix-bg"></div>
+    
+    <!-- Data Streams -->
+    <div class="data-stream" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="data-stream" style="left: 25%; animation-delay: 1s;"></div>
+    <div class="data-stream" style="left: 40%; animation-delay: 2s;"></div>
+    <div class="data-stream" style="left: 55%; animation-delay: 0.5s;"></div>
+    <div class="data-stream" style="left: 70%; animation-delay: 1.5s;"></div>
+    <div class="data-stream" style="left: 85%; animation-delay: 2.5s;"></div>
+    
+    <!-- Main Content -->
+    <main class="relative z-10 min-h-screen flex flex-col items-center justify-center">
+        <!-- Hero Text Animation -->
+        <div class="text-center mb-16">
+            <div class="zero-text">ZERO</div>
+            <div class="day-text">DAY</div>
+            <div class="tagline">
+                > HACK THE MIND. BURN THE NORM.
+            </div>
+        </div>
+        
+<!-- 3D Flame Navigation -->
+<nav class="flame-nav">
+    <div class="flex items-center justify-center gap-8 md:gap-12">
+        <!-- Telegram Flame -->
+        <a href="https://t.me/Encrypteed" target="_blank" class="flame-button telegram group" title="Telegram - Encrypted Messaging">
+            <svg class="w-8 h-8 text-text-primary group-hover:text-blue-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+            </svg>
+        </a>
+        
+        <!-- Instagram Flame -->
+        <a href="https://www.instagram.com/void.m.v?igsh=MWt1Mmllb3BsZ3Izcg==" target="_blank" class="flame-button instagram group" title="Instagram - Visual Stories">
+            <svg class="w-8 h-8 text-text-primary group-hover:text-pink-500 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+        </a>
+        
+        <!-- TikTok Flame -->
+        <a href="https://www.tiktok.com/@zeroo_day?_t=ZM-8yM79ROFL68&_r=1" target="_blank" class="flame-button tiktok group" title="TikTok - Short Form Content">
+            <svg class="w-8 h-8 text-text-primary group-hover:text-red-500 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+            </svg>
+        </a>
+        
+        <!-- YouTube Flame -->
+        <a href="https://youtube.com/@youhubzero" target="_blank" class="flame-button youtube group" title="YouTube - Video Content">
+            <svg class="w-8 h-8 text-text-primary group-hover:text-red-600 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+        </a>
+        
+        <!-- Discord Flame -->
+        <a href="https://discord.com/users/zeroday.__" target="_blank" class="flame-button discord group" title="Discord - Community Hub">
+            <svg class="w-8 h-8 text-text-primary group-hover:text-purple-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419-.0190 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1568 2.4189Z"/>
+            </svg>
+        </a>
+    </div>
+</nav>
+        
+        <!-- Hidden Terminal Access Hint -->
+        <div class="absolute bottom-8 left-8 opacity-30 text-xs font-source-code">
+            <div class="animate-pulse">
+                > KONAMI_CODE_DETECTED
+            </div>
+        </div>
+        
+        <!-- System Status Indicator -->
+        <div class="absolute bottom-8 right-8 opacity-50 text-xs font-source-code">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                <span>SYSTEM_ONLINE</span>
+            </div>
+            <div class="text-text-secondary mt-1">
+                UPTIME: 99.97% | LATENCY: 12ms
+            </div>
+        </div>
+    </main>
+    
+    <!-- Hidden Terminal Interface -->
+    <div class="terminal-overlay" id="terminal">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-dot bg-error"></div>
+                <div class="terminal-dot bg-warning"></div>
+                <div class="terminal-dot bg-success"></div>
+                <span class="text-text-primary font-source-code text-sm ml-4">ZERO_DAY_TERMINAL v2.1.0</span>
+                <button class="ml-auto text-text-secondary hover:text-text-primary" onclick="closeTerminal()">×</button>
+            </div>
+            <div class="terminal-content" id="terminalContent">
+                <div class="mb-4">
+                    <pre class="text-primary">
+ ███████╗███████╗██████╗  ██████╗     ██████╗  █████╗ ██╗   ██╗
+ ╚══███╔╝██╔════╝██╔══██╗██╔═══██╗    ██╔══██╗██╔══██╗╚██╗ ██╔╝
+   ███╔╝ █████╗  ██████╔╝██║   ██║    ██║  ██║███████║ ╚████╔╝ 
+  ███╔╝  ██╔══╝  ██╔══██╗██║   ██║    ██║  ██║██╔══██║  ╚██╔╝  
+ ███████╗███████╗██║  ██║╚██████╔╝    ██████╔╝██║  ██║   ██║   
+ ╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝     ╚═════╝ ╚═╝  ╚═╝   ╚═╝   
+                    </pre>
+                </div>
+                <div class="text-text-secondary mb-4">
+                    > WELCOME TO THE GRID, OPERATOR<br />
+                    > SYSTEM STATUS: FULLY OPERATIONAL<br />
+                    > SECURITY LEVEL: MAXIMUM<br />
+                    > LAST LOGIN: 2025-07-26 17:24:51 UTC<br />
+                </div>
+                <div class="text-primary mb-4">
+                    > AVAILABLE COMMANDS:<br />
+                    &nbsp;&nbsp;- status: System diagnostics<br />
+                    &nbsp;&nbsp;- matrix: Enter the matrix<br />
+                    &nbsp;&nbsp;- ghost: Activate ghost protocol<br />
+                    &nbsp;&nbsp;- exit: Close terminal<br />
+                </div>
+                <div class="text-warning mb-4">
+                    > WARNING: UNAUTHORIZED ACCESS DETECTED<br />
+                    > INITIATING COUNTERMEASURES...<br />
+                    > JUST KIDDING. WELCOME TO THE UNDERGROUND.<br />
+                </div>
+                <div class="text-accent">
+                    > "In a world of locked doors, the man with the key is king."<br />
+                    > - Zero Day, 2025<br />
+                </div>
+                <div class="mt-8 text-text-primary">
+                    <span class="text-primary">zero@day:~$</span> <span class="animate-pulse">_</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Custom cursor implementation
+        const cursor = document.getElementById('cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Create particle trail
+            createParticleTrail(e.clientX, e.clientY);
+        });
+        
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.1;
+            cursorY += (mouseY - cursorY) * 0.1;
+            
+            cursor.style.left = cursorX - 10 + 'px';
+            cursor.style.top = cursorY - 10 + 'px';
+            
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+        
+        function createParticleTrail(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'cursor-trail';
+            particle.style.left = x - 2 + 'px';
+            particle.style.top = y - 2 + 'px';
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 800);
+        }
+        
+        // Konami Code Detection
+        let konamiCode = [];
+        const konamiSequence = [
+            'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+            'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+            'KeyB', 'KeyA'
+        ];
+        
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.code);
+            
+            if (konamiCode.length > konamiSequence.length) {
+                konamiCode.shift();
+            }
+            
+            if (JSON.stringify(konamiCode) === JSON.stringify(konamiSequence)) {
+                openTerminal();
+                konamiCode = [];
+            }
+        });
+        
+        function openTerminal() {
+            document.getElementById('terminal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeTerminal() {
+            document.getElementById('terminal').style.display = 'none';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Flame button hover effects
+        document.querySelectorAll('.flame-button').forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                // Add extra glow effect
+                button.style.filter = 'brightness(1.2) saturate(1.5)';
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                button.style.filter = 'brightness(1) saturate(1)';
+            });
+        });
+        
+        // Ambient audio (optional - commented out for compatibility)
+        /*
+        const ambientAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmHgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+        ambientAudio.loop = true;
+        ambientAudio.volume = 0.1;
+        
+        // Auto-play ambient audio (user interaction required)
+        document.addEventListener('click', () => {
+            ambientAudio.play().catch(() => {});
+        }, { once: true });
+        */
+        
+        // Performance optimization for mobile
+        if (window.innerWidth <= 768) {
+            // Reduce particle trail frequency on mobile
+            let lastTrailTime = 0;
+            const originalCreateParticleTrail = createParticleTrail;
+            
+            createParticleTrail = function(x, y) {
+                const now = Date.now();
+                if (now - lastTrailTime > 100) { // Throttle to every 100ms
+                    originalCreateParticleTrail(x, y);
+                    lastTrailTime = now;
+                }
+            };
+        }
+        
+        // Preload critical assets
+        const preloadImages = [
+            'https://images.unsplash.com/photo-1518709268805-4e9042af2176?q=80&w=2825&auto=format&fit=crop',
+            'https://images.pexels.com/photos/2004161/pexels-photo-2004161.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+        ];
+        
+        preloadImages.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+        
+        // Add glitch effect on text hover
+        document.querySelectorAll('.zero-text, .day-text').forEach(text => {
+            text.addEventListener('mouseenter', () => {
+                text.style.animation = 'none';
+                text.style.filter = 'hue-rotate(90deg) saturate(2)';
+                
+                setTimeout(() => {
+                    text.style.filter = 'none';
+                }, 200);
+            });
+        });
+        
+        // Easter egg: Click sequence on logo
+        let clickCount = 0;
+        document.querySelectorAll('.zero-text, .day-text').forEach(text => {
+            text.addEventListener('click', () => {
+                clickCount++;
+                if (clickCount >= 5) {
+                    // Trigger special effect
+                    document.body.style.filter = 'invert(1) hue-rotate(180deg)';
+                    setTimeout(() => {
+                        document.body.style.filter = 'none';
+                        clickCount = 0;
+                    }, 1000);
+                }
+            });
+        });
+    </script>
+<script id="dhws-dataInjector" src="dhws-data-injector.js"></script>
+</body>
+</html>
