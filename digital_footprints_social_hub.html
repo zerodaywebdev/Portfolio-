@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital Footprints - Social Hub | Zero Day Portal</title>
+    <link rel="stylesheet" href="main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <style>
+    /* Custom cursor and particle effects */
+    body {
+        cursor: none;
+        overflow-x: hidden;
+    }
+    
+    .custom-cursor {
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        mix-blend-mode: screen;
+        transition: transform 0.1s ease;
+    }
+    
+    .cursor-trail {
+        position: fixed;
+        width: 4px;
+        height: 4px;
+        background: var(--color-primary);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9998;
+        opacity: 0.7;
+        animation: fade-out 0.8s ease-out forwards;
+    }
+    
+    @keyframes fade-out {
+        to {
+            opacity: 0;
+            transform: scale(0);
+        }
+    }
+    
+    .matrix-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            linear-gradient(90deg, transparent 98%, rgba(0, 255, 65, 0.03) 100%),
+            linear-gradient(180deg, transparent 98%, rgba(0, 255, 65, 0.03) 100%);
+        background-size: 50px 50px;
+        animation: matrix-grid 20s linear infinite;
+        z-index: 1;
+    }
+    
+    @keyframes matrix-grid {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
+    }
+    
+    .data-stream {
+        position: absolute;
+        width: 2px;
+        height: 100px;
+        background: linear-gradient(to bottom, transparent, var(--color-primary), transparent);
+        animation: stream-flow 3s linear infinite;
+    }
+    
+    @keyframes stream-flow {
+        0% { transform: translateY(-100px); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(100vh); opacity: 0; }
+    }
+    
+    .terminal-window {
+        background: var(--color-background);
+        border: 2px solid var(--color-primary);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+        backdrop-filter: blur(8px);
+    }
+    
+    .terminal-header {
+        background: var(--color-surface);
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--color-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .terminal-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .flame-button {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: radial-gradient(circle at center, var(--color-primary-10), transparent);
+        border: 2px solid var(--color-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        overflow: hidden;
+    }
+    
+    .flame-button:hover {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 255, 65, 0.4);
+    }
+    
+    .flame-button.telegram:hover {
+        border-color: #0088cc;
+        box-shadow: 0 15px 30px rgba(0, 136, 204, 0.4);
+    }
+    
+    .flame-button.instagram:hover {
+        border-color: #e1306c;
+        box-shadow: 0 15px 30px rgba(225, 48, 108, 0.4);
+    }
+    
+    .flame-button.tiktok:hover {
+        border-color: #ff0050;
+        box-shadow: 0 15px 30px rgba(255, 0, 80, 0.4);
+    }
+    
+    .flame-button.youtube:hover {
+        border-color: #ff0000;
+        box-shadow: 0 15px 30px rgba(255, 0, 0, 0.4);
+    }
+    
+    .flame-button.discord:hover {
+        border-color: #7289DA;
+        box-shadow: 0 15px 30px rgba(114, 137, 218, 0.4);
+    }
+    
+    .flame-button::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(from 0deg, transparent, var(--color-primary-10), transparent);
+        animation: rotate 3s linear infinite;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .flame-button:hover::before {
+        opacity: 1;
+    }
+    
+    @keyframes rotate {
+        to { transform: rotate(360deg); }
+    }
+    
+    .activity-item {
+        opacity: 0;
+        animation: slide-in 0.5s ease-out forwards;
+    }
+    
+    @keyframes slide-in {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .signal-strength {
+        display: inline-block;
+        width: 4px;
+        height: 20px;
+        background: var(--color-primary);
+        margin-right: 2px;
+        animation: signal-pulse 1.5s ease-in-out infinite;
+    }
+    
+    .signal-strength:nth-child(2) { animation-delay: 0.1s; }
+    .signal-strength:nth-child(3) { animation-delay: 0.2s; }
+    .signal-strength:nth-child(4) { animation-delay: 0.3s; }
+    .signal-strength:nth-child(5) { animation-delay: 0.4s; }
+    
+    @keyframes signal-pulse {
+        0%, 100% { opacity: 0.3; transform: scaleY(0.5); }
+        50% { opacity: 1; transform: scaleY(1); }
+    }
+    
+    .particle-burst {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--color-primary);
+        border-radius: 50%;
+        pointer-events: none;
+        animation: particle-burst 1s ease-out forwards;
+    }
+    
+    @keyframes particle-burst {
+        0% {
+            opacity: 1;
+            transform: scale(1) translate(0, 0);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0) translate(var(--dx, 0), var(--dy, 0));
+        }
+    }
+    
+    .glitch-text {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .glitch-text::before,
+    .glitch-text::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+    }
+    
+    .glitch-text:hover::before {
+        animation: glitch-1 0.3s ease-in-out;
+        color: var(--color-secondary);
+        z-index: -1;
+    }
+    
+    .glitch-text:hover::after {
+        animation: glitch-2 0.3s ease-in-out;
+        color: var(--color-accent);
+        z-index: -2;
+    }
+    
+    @keyframes glitch-1 {
+        0%, 100% { transform: translate(0); opacity: 0; }
+        20% { transform: translate(-2px, 2px); opacity: 1; }
+        40% { transform: translate(-2px, -2px); opacity: 1; }
+        60% { transform: translate(2px, 2px); opacity: 1; }
+        80% { transform: translate(2px, -2px); opacity: 1; }
+    }
+    
+    @keyframes glitch-2 {
+        0%, 100% { transform: translate(0); opacity: 0; }
+        20% { transform: translate(2px, -2px); opacity: 1; }
+        40% { transform: translate(2px, 2px); opacity: 1; }
+        60% { transform: translate(-2px, -2px); opacity: 1; }
+        80% { transform: translate(-2px, 2px); opacity: 1; }
+    }
+    
+    .network-pulse {
+        animation: network-pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes network-pulse {
+        0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); }
+        50% { box-shadow: 0 0 40px rgba(0, 255, 65, 0.4); }
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+        .flame-button {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .terminal-window {
+            margin: 0.5rem;
+        }
+        
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Pull to refresh indicator */
+    .pull-refresh {
+        position: absolute;
+        top: -60px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: var(--color-primary);
+        font-size: 0.875rem;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+    
+    .pull-refresh.active {
+        opacity: 1;
+        top: 20px;
+    }
+</style>
+<script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fzerodayp4313back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.6"></script>
+</head>
+<body class="bg-background text-text-primary font-jetbrains">
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="cursor"></div>
+    
+    <!-- Matrix Background Grid -->
+    <div class="matrix-bg"></div>
+    
+    <!-- Data Streams -->
+    <div class="data-stream" style="left: 5%; animation-delay: 0s;"></div>
+    <div class="data-stream" style="left: 15%; animation-delay: 1s;"></div>
+    <div class="data-stream" style="left: 25%; animation-delay: 2s;"></div>
+    <div class="data-stream" style="left: 35%; animation-delay: 0.5s;"></div>
+    <div class="data-stream" style="left: 45%; animation-delay: 1.5s;"></div>
+    <div class="data-stream" style="left: 55%; animation-delay: 2.5s;"></div>
+    <div class="data-stream" style="left: 65%; animation-delay: 0.8s;"></div>
+    <div class="data-stream" style="left: 75%; animation-delay: 1.8s;"></div>
+    <div class="data-stream" style="left: 85%; animation-delay: 2.2s;"></div>
+    <div class="data-stream" style="left: 95%; animation-delay: 0.3s;"></div>
+    
+    <!-- Pull to Refresh Indicator -->
+    <div class="pull-refresh" id="pullRefresh">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <span>REFRESHING DATA STREAMS...</span>
+        </div>
+    </div>
+    
+    <!-- Header Navigation -->
+    <header class="relative z-50 border-b border-primary/20 backdrop-blur-cyber">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="div>
+                
+                <!-- Timeline Item 4 -->
+                <div class="flex items-start gap-4 activity-item">
+                    <div class="flame-button tiktok" style="width: 40px; height: 40px; flex-shrink: 0;">
+                        <svg class="w-5 h-5 text-text-primary" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-primary font-source-code">TIKTOK_VIDEO</span>
+                            <span class="text-text-secondary text-xs font-source-code">12:30:45 UTC</span>
+                        </div>
+                        <p class="text-text-secondary mb-2">When your code finally works 🔥</p>
+                        <div class="flex items-center gap-4 text-xs text-text-secondary">
+                            <span>15.7K views</span>
+                            <span>2.1K likes</span>
+                            <span class="text-primary">viral</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+            
+<!-- Quick Actions -->
+<section class="text-center">
+    <div class="flex flex-wrap justify-center gap-4">
+        <a href="https://t.me/Encrypteed" target="_blank" class="flame-button telegram group">
+            <svg class="w-6 h-6 text-text-primary group-hover:text-blue-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+            </svg>
+        </a>
+        
+        <a href="https://www.instagram.com/void.m.v?igsh=MWt1Mmllb3BsZ3Izcg==" target="_blank" class="flame-button instagram group">
+            <svg class="w-6 h-6 text-text-primary group-hover:text-pink-500 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+        </a>
+        
+        <a href="https://www.tiktok.com/@zeroo_day?_t=ZM-8yM79ROFL68&_r=1" target="_blank" class="flame-button tiktok group">
+            <svg class="w-6 h-6 text-text-primary group-hover:text-red-500 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+            </svg>
+        </a>
+        
+        <a href="https://youtube.com/@youhubzero" target="_blank" class="flame-button youtube group">
+            <svg class="w-6 h-6 text-text-primary group-hover:text-red-600 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+        </a>
+        
+        <a href="https://discord.com/users/zeroday.__" target="_blank" class="flame-button discord group">
+            <svg class="w-6 h-6 text-text-primary group-hover:text-purple-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419-.0190 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1568 2.4189Z"/>
+            </svg>
+        </a>
+        
+        <a href="portal_entry_homepage.html" class="flame-button group">
+            <svg class="w-6 h-6 text-text-primary group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+        </a>
+    </div>
+    
+    <div class="mt-8 text-text-secondary font-source-code text-sm">
+        > NETWORK_STATUS: FULLY_OPERATIONAL<br />
+        > LAST_SYNC: 2025-07-26 17:24:51 UTC<br />
+        > NEXT_UPDATE: AUTO_REFRESH_ENABLED
+    </div>
+</section>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-primary/20 backdrop-blur-cyber">
+        <div class="container mx-auto px-6 py-8">
+            <div class="text-center">
+                <div class="font-orbitron font-black text-2xl mb-4">
+                    <span class="text-primary">ZERO</span>
+                    <span class="text-secondary">DAY</span>
+                </div>
+                <p class="text-text-secondary font-source-code text-sm mb-4">
+                    > HACK THE MIND. BURN THE NORM.
+                </p>
+                <div class="text-xs text-text-secondary font-source-code">
+                    © 2025 Zero Day Portal. All Rights Reserved.<br />
+                    UPTIME: 99.97% | LATENCY: 12ms | NODES: 2,847
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Custom cursor implementation
+        const cursor = document.getElementById('cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Create particle trail
+            createParticleTrail(e.clientX, e.clientY);
+        });
+        
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.1;
+            cursorY += (mouseY - cursorY) * 0.1;
+            
+            cursor.style.left = cursorX - 10 + 'px';
+            cursor.style.top = cursorY - 10 + 'px';
+            
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+        
+        function createParticleTrail(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'cursor-trail';
+            particle.style.left = x - 2 + 'px';
+            particle.style.top = y - 2 + 'px';
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 800);
+        }
+        
+        // Follow platform function with particle effects
+        function followPlatform(platform) {
+            // Create particle burst effect
+            const button = event.target.closest('.flame-button') || event.target.closest('button');
+            if (button) {
+                createParticleBurst(button);
+            }
+            
+            // Show confirmation message
+            showNotification(`PROTOCOL_INITIATED: ${platform.toUpperCase()}_CONNECTION_ESTABLISHED`);
+            
+            // Simulate follow action
+            setTimeout(() => {
+                showNotification(`NETWORK_EXPANDED: +1_NODE_ADDED`);
+            }, 1500);
+        }
+        
+        function createParticleBurst(element) {
+            const rect = element.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            for (let i = 0; i < 12; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle-burst';
+                
+                const angle = (i / 12) * Math.PI * 2;
+                const distance = 50 + Math.random() * 30;
+                const dx = Math.cos(angle) * distance;
+                const dy = Math.sin(angle) * distance;
+                
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                particle.style.setProperty('--dx', dx + 'px');
+                particle.style.setProperty('--dy', dy + 'px');
+                
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
+            }
+        }
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-surface border border-primary rounded-lg p-4 z-50 font-source-code text-sm text-primary';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+        
+        // Refresh timeline function
+        function refreshTimeline() {
+            const timeline = document.getElementById('unifiedTimeline');
+            timeline.style.opacity = '0.5';
+            
+            showNotification('REFRESHING_DATA_STREAMS...');
+            
+            setTimeout(() => {
+                timeline.style.opacity = '1';
+                showNotification('DATA_STREAMS_UPDATED');
+            }, 2000);
+        }
+        
+        // Mobile pull-to-refresh functionality
+        let startY = 0;
+        let currentY = 0;
+        let pullDistance = 0;
+        let isPulling = false;
+        
+        document.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                startY = e.touches[0].clientY;
+                isPulling = true;
+            }
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (!isPulling) return;
+            
+            currentY = e.touches[0].clientY;
+            pullDistance = currentY - startY;
+            
+            if (pullDistance > 0 && pullDistance < 100) {
+                e.preventDefault();
+                const pullRefresh = document.getElementById('pullRefresh');
+                pullRefresh.style.transform = `translateY(${pullDistance}px)`;
+                
+                if (pullDistance > 60) {
+                    pullRefresh.classList.add('active');
+                }
+            }
+        });
+        
+        document.addEventListener('touchend', () => {
+            if (isPulling && pullDistance > 60) {
+                refreshTimeline();
+            }
+            
+            const pullRefresh = document.getElementById('pullRefresh');
+            pullRefresh.style.transform = 'translateY(0)';
+            pullRefresh.classList.remove('active');
+            
+            isPulling = false;
+            pullDistance = 0;
+        });
+        
+        // Auto-refresh data streams every 30 seconds
+        setInterval(() => {
+            // Simulate new activity
+            const activities = document.querySelectorAll('.activity-item');
+            if (activities.length > 0) {
+                const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+                randomActivity.style.animation = 'none';
+                setTimeout(() => {
+                    randomActivity.style.animation = 'slide-in 0.5s ease-out forwards';
+                }, 100);
+            }
+        }, 30000);
+        
+        // Performance optimization for mobile
+        if (window.innerWidth <= 768) {
+            // Reduce particle trail frequency on mobile
+            let lastTrailTime = 0;
+            const originalCreateParticleTrail = createParticleTrail;
+            
+            createParticleTrail = function(x, y) {
+                const now = Date.now();
+                if (now - lastTrailTime > 150) { // Throttle to every 150ms
+                    originalCreateParticleTrail(x, y);
+                    lastTrailTime = now;
+                }
+            };
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate activity items on load
+            const activityItems = document.querySelectorAll('.activity-item');
+            activityItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // Show welcome message
+            setTimeout(() => {
+                showNotification('DIGITAL_FOOTPRINTS_LOADED: ALL_SYSTEMS_OPERATIONAL');
+            }, 1000);
+        });
+        
+        // Mobile menu functionality
+        document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+            // Toggle mobile menu (simplified for this demo)
+            showNotification('MOBILE_MENU: FEATURE_COMING_SOON');
+        });
+    </script>
+<script id="dhws-dataInjector" src="dhws-data-injector.js"></script>
+</body>
+</html>
